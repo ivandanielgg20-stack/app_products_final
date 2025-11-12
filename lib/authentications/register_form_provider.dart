@@ -2,8 +2,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_final/authentications/auth_provider.dart';
 import 'package:flutter_riverpod/legacy.dart';
-
-
 class RegisterFormState {
   final String fullname;
   final String email;

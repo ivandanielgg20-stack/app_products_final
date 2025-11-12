@@ -12,16 +12,50 @@ class AuthDataSourceImpl extends AuthDataSource {
     return UserMapper.jsonToEntity(response.data);
   }
 
-  @override
-  Future<User> login(String email, String password) async {
-    final response = await dio.post('/auth/login', data: {'email': email, 'password': password});
+ @override
+@override
+Future<User> login(String email, String password) async {
+  final response = await dio.post(
+    '/auth/login',
+    data: {
+      'email': email,
+      'password': password,
+    },
+    options: Options(
+      headers: {'Content-Type': 'application/json'},
+      validateStatus: (status) => status! < 500,
+    ),
+  );
+
+  if (response.statusCode == 200) {
     return UserMapper.jsonToEntity(response.data);
   }
 
-  @override
-  Future<User> register(String email, String password, String fullname) async {
-    final response = await dio.post('/auth/register', data: {'email': email, 'password': password, 'fullname': fullname});
-    return UserMapper.jsonToEntity(response.data);
-  }
+  throw Exception('Sesion iniciada: ${response.data['message'] ?? response.data}');
 }
 
+
+
+@override
+Future<User> register(String email, String password, String fullname) async {
+  final response = await dio.post(
+    '/auth/register',
+    data: {
+      'email': email,
+      'password': password,
+      'fullName': fullname,
+    },
+    options: Options(
+      headers: {'Content-Type': 'application/json'},
+      validateStatus: (status) => status! < 500,
+    ),
+  );
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return UserMapper.jsonToEntity(response.data);
+  }
+
+  throw Exception('Registro exitoso: ${response.data['message'] ?? response.data}');
+}
+
+}
