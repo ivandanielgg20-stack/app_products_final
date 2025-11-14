@@ -87,7 +87,7 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('¡Cuenta creada con éxito!'),
+        content: Text('Cuenta creada con éxito!'),
         backgroundColor: Colors.green,
       ),
     );
