@@ -1,4 +1,3 @@
-
 import 'package:app_final/screens/Login.dart';
 import 'package:app_final/screens/products.dart';
 import 'package:app_final/screens/register.dart';
@@ -16,9 +15,9 @@ final appRouter = GoRouter(
       builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
-      path: '/',
-      builder: (context, state) => const ProductsScreen(),
-    ),
+  path:'/menu',
+  builder: (context, state) => const ProductsScreen(),
+),
   ],
 );
  

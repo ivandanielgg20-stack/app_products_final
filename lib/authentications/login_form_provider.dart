@@ -1,7 +1,10 @@
 
+import 'package:app_final/manage_errors/CustomError.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_final/authentications/auth_provider.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 class LoginFormState {
   final String email;
   final String password;
@@ -55,20 +58,33 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
     );
   }
 
-  Future<void> submit(WidgetRef ref) async {
-    if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
-    if (state.email.isEmpty || state.password.isEmpty) return;
+  Future<void> submit(WidgetRef ref, BuildContext context) async {
+  if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
+  if (state.email.isEmpty || state.password.isEmpty) return;
 
-    state = state.copyWith(isLoading: true);
-    try {
-      await ref.read(authProvider.notifier).login(state.email, state.password);
-    } finally {
-      state = state.copyWith(isLoading: false);
-    }
+  state = state.copyWith(isLoading: true);
+  try {
+    await ref.read(authProvider.notifier).login(state.email, state.password);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('¡Inicio de sesión exitoso!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    context.go('/menu');
+  } on CustomError catch (e) {
+    throw Exception(e.message);
+  } finally {
+    state = state.copyWith(isLoading: false);
   }
 }
 
+
+
+}
 final loginFormProvider =
-    StateNotifierProvider<LoginFormNotifier, LoginFormState>((ref) {
-  return LoginFormNotifier();
-});
+    StateNotifierProvider<LoginFormNotifier, LoginFormState>(
+  (ref) => LoginFormNotifier(),
+);

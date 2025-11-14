@@ -146,13 +146,22 @@ class _RegisterForm extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             height: 60,
-            child: CustomFilledButton(
-              text: form.isLoading ? 'Creando...' : 'Crear',
-              buttonColor: Colors.black,
-              onPressed: (form.isLoading || passwordsMismatch)
-                  ? null
-                  : () => ref.read(registerFormProvider.notifier).submit(ref),
-            ),
+            child: CustomFilledButton(text: form.isLoading ? 'Creando...' : 'Crear',
+                buttonColor: Colors.black,
+                  onPressed: (form.isLoading || passwordsMismatch)
+                      ? null: () async {
+                       try {
+                    await ref.read(registerFormProvider.notifier).submit(ref, context);
+                   } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                 SnackBar(
+                content: Text(e.toString()),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+),
           ),
 
           const SizedBox(height: 40),

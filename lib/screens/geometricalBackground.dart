@@ -34,7 +34,7 @@ class GeometricalBackground extends StatelessWidget {
           Container(
             height: size.height * 0.7,
             decoration: const BoxDecoration(
-              color: Colors.black,
+              color: Color.fromARGB(255, 102, 94, 94),
             ),
             child: Column(
               children: [
@@ -102,7 +102,7 @@ class _Circle extends StatelessWidget {
       width: borderSize,
       height: borderSize,
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: const Color.fromARGB(108, 8, 7, 7),
         borderRadius: BorderRadius.circular(50)
       ),
     );
@@ -121,7 +121,7 @@ class _Square extends StatelessWidget {
       width: borderSize,
       height: borderSize,
       decoration: const BoxDecoration(
-        color: Colors.white10,
+        color: Color.fromARGB(115, 190, 192, 90),
       ),
     );
   }
@@ -149,7 +149,7 @@ class _RightTrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = const Color.fromARGB(174, 194, 75, 75)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -186,7 +186,7 @@ class _LeftTrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = const Color.fromARGB(134, 194, 49, 182)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -223,7 +223,7 @@ class _DiamondPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = const Color.fromARGB(108, 110, 14, 148)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -262,7 +262,7 @@ class _SemiCirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = const Color.fromARGB(132, 56, 182, 31)
       ..style = PaintingStyle.fill;
 
     canvas.drawArc(
@@ -303,7 +303,7 @@ class _SemiCircleInvertedPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = const Color.fromARGB(108, 160, 56, 56)
       ..style = PaintingStyle.fill;
 
     canvas.drawArc(

@@ -1,7 +1,10 @@
 
+import 'package:app_final/manage_errors/CustomError.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_final/authentications/auth_provider.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 class RegisterFormState {
   final String fullname;
   final String email;
@@ -69,25 +72,35 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
   void onConfirmPasswordChanged(String value) =>
       state = state.copyWith(confirmPassword: value);
 
-  Future<void> submit(WidgetRef ref) async {
-    if (state.password != state.confirmPassword) return;
-    if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
-    if (state.fullname.isEmpty || state.email.isEmpty || state.password.isEmpty) return;
+  Future<void> submit(WidgetRef ref, BuildContext context) async {
+  if (state.password != state.confirmPassword) return;
+  if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
+  if (state.fullname.isEmpty || state.email.isEmpty || state.password.isEmpty) return;
 
-    state = state.copyWith(isLoading: true);
-    try {
-      await ref.read(authProvider.notifier).register(
-            state.email,
-            state.password,
-            state.fullname,
-          );
-    } finally {
-      state = state.copyWith(isLoading: false);
-    }
+  state = state.copyWith(isLoading: true);
+  try {
+    await ref.read(authProvider.notifier).register(
+      state.email,
+      state.password,
+      state.fullname,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('¡Cuenta creada con éxito!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+      context.go('/menu');
+  } on CustomError catch (e) {
+    throw Exception(e.message);
+  } finally {
+    state = state.copyWith(isLoading: false);
   }
 }
 
+}
 final registerFormProvider =
-    StateNotifierProvider<RegisterFormNotifier, RegisterFormState>((ref) {
-  return RegisterFormNotifier();
-});
+    StateNotifierProvider<RegisterFormNotifier, RegisterFormState>(
+  (ref) => RegisterFormNotifier(),
+);

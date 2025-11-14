@@ -8,6 +8,7 @@ import 'package:app_final/screens/geometricalBackground.dart';
 import 'package:app_final/themes&colors/CustomTextFormField.dart';
 
 
+
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -26,7 +27,7 @@ class LoginScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 80),
                 const Icon(Icons.production_quantity_limits_rounded,
-                    color: Colors.blueGrey, size: 100),
+                    color: Color.fromARGB(255, 84, 3, 122), size: 100),
                 const SizedBox(height: 80),
                 Container(
                   width: double.infinity,
@@ -105,16 +106,29 @@ class _LoginForm extends ConsumerWidget {
 
           SizedBox(
             width: double.infinity,
+
+            
             child: CustomFilledButton(
               text: form.isLoading ? 'Cargando...' : 'Ingresar',
               buttonColor: Colors.black,
               onPressed: form.isLoading
                   ? null
-                  : () => ref.read(loginFormProvider.notifier).submit(ref),
+                  : () async {
+                    try {
+            await ref.read(loginFormProvider.notifier).submit(ref, context);
+          }catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(e.toString()),
+                backgroundColor: Colors.red,)
+            );
+          }
+                  },
             ),
-          ),
 
-          const SizedBox(height: 40),
+            ),
+          const SizedBox(height: 20),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
