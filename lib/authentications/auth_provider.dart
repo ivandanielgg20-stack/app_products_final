@@ -1,8 +1,10 @@
-
+import 'package:app_final/authentications/users/token_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_final/authentications/users/user.dart';
+import 'package:app_final/authentications/auth_repository_impl.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'auth_repository_impl.dart';
 
+ // ✅ ruta corregida
 
 enum AuthStatus { authenticated, unauthenticated, checking }
 
@@ -38,24 +40,59 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
   Future<void> login(String email, String password) async {
     state = state.copyWith(status: AuthStatus.checking);
     try {
+      print('📡 Llamando a login...');
       final user = await authRepository.login(email, password);
+
+      if (user.token.isEmpty) throw Exception('Token vacío desde backend');
+
+      await TokenHelper.saveToken(user.token);
+      final check = await TokenHelper.getToken();
+      print('🔐 Token verificado: $check');
+
+      if (check == null || check.isEmpty) {
+        throw Exception('El token no fue guardado correctamente');
+      }
+
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
+      print('✅ Login exitoso');
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.unauthenticated, errorMessage: e.toString());
+      print('❌ Error en login: $e');
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        errorMessage: e.toString(),
+      );
     }
   }
 
   Future<void> register(String email, String password, String fullname) async {
     state = state.copyWith(status: AuthStatus.checking);
     try {
+      print('📡 Llamando a register...');
       final user = await authRepository.register(email, password, fullname);
+
+      if (user.token.isEmpty) throw Exception('Token vacío desde backend');
+
+      await TokenHelper.saveToken(user.token);
+      final check = await TokenHelper.getToken();
+      print('🔐 Token verificado: $check');
+
+      if (check == null || check.isEmpty) {
+        throw Exception('El token no fue guardado correctamente');
+      }
+
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
+      print('✅ Registro exitoso');
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.unauthenticated, errorMessage: e.toString());
+      print('❌ Error en register: $e');
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        errorMessage: e.toString(),
+      );
     }
   }
 
-  void logout() {
+  void logout() async {
+    await TokenHelper.deleteToken();
     state = AuthProvider(status: AuthStatus.unauthenticated);
   }
 }
@@ -63,3 +100,4 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthProvider>((ref) {
   return AuthNotifier();
 });
+

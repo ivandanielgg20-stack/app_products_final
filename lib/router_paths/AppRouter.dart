@@ -1,3 +1,4 @@
+import 'package:app_final/authentications/products_form_provider.dart';
 import 'package:app_final/screens/Login.dart';
 import 'package:app_final/screens/products.dart';
 import 'package:app_final/screens/register.dart';
@@ -15,9 +16,12 @@ final appRouter = GoRouter(
       builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
-  path:'/menu',
-  builder: (context, state) => const ProductsScreen(),
-),
+      path: '/menu',
+      builder: (context, state) => const ProductsScreen(),
+    ),
+    GoRoute(
+      path: '/add-product',
+      builder: (context, state) => const ProductForm(), // 👈 nueva ruta
+    ),
   ],
 );
- 

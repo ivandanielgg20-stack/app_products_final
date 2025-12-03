@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_final/authentications/auth_provider.dart';
-import 'package:app_final/authentications/register_form_provider.dart';
 import 'package:app_final/buttons/custombutton.dart';
 import 'package:app_final/screens/geometricalBackground.dart';
 import 'package:app_final/themes&colors/CustomTextFormField.dart';
+import 'package:app_final/authentications/register_form_provider.dart';
+
+
+
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -74,7 +77,7 @@ class _RegisterForm extends ConsumerWidget {
 
     if (auth.status == AuthStatus.authenticated) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/');
+        context.go('/menu');
       });
     }
 

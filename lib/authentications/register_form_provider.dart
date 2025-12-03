@@ -1,4 +1,5 @@
 
+import 'package:app_final/authentications/users/token_helper.dart';
 import 'package:app_final/manage_errors/CustomError.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,11 +62,12 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
 
   void onPasswordChanged(String value) {
     final isValid = value.length >= 6 &&
-        RegExp(r'[A-Za-z]').hasMatch(value) &&
+        RegExp(r'[A-Z]').hasMatch(value) &&
+        RegExp(r'[a-z]').hasMatch(value) &&
         RegExp(r'\d').hasMatch(value);
     state = state.copyWith(
       password: value,
-      passwordError: isValid ? '' : 'Contraseña débil',
+      passwordError: isValid ? '' : 'Debe tener mayúscula, minúscula y número',
     );
   }
 
@@ -73,32 +75,59 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
       state = state.copyWith(confirmPassword: value);
 
   Future<void> submit(WidgetRef ref, BuildContext context) async {
-  if (state.password != state.confirmPassword) return;
-  if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
-  if (state.fullname.isEmpty || state.email.isEmpty || state.password.isEmpty) return;
+    if (state.password != state.confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Las contraseñas no coinciden'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-  state = state.copyWith(isLoading: true);
-  try {
-    await ref.read(authProvider.notifier).register(
-      state.email,
-      state.password,
-      state.fullname,
-    );
+    if (state.emailError.isNotEmpty || state.passwordError.isNotEmpty) return;
+    if (state.fullname.isEmpty || state.email.isEmpty || state.password.isEmpty) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Cuenta creada con éxito!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    state = state.copyWith(isLoading: true);
+    try {
+      await ref.read(authProvider.notifier).register(
+        state.email,
+        state.password,
+        state.fullname,
+      );
+
+      final token = await TokenHelper.getToken();
+      print('Token después del registro: $token');
+
+      if (token == null || token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error: No se pudo guardar el token de autenticación'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cuenta creada con éxito!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
       context.go('/menu');
-  } on CustomError catch (e) {
-    throw Exception(e.message);
-  } finally {
-    state = state.copyWith(isLoading: false);
+    } on CustomError catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
   }
-}
-
 }
 final registerFormProvider =
     StateNotifierProvider<RegisterFormNotifier, RegisterFormState>(

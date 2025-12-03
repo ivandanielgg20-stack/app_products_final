@@ -16,7 +16,7 @@ class AppTheme {
 
 
       ),
-      scaffoldBackgroundColor: const Color.fromARGB(169, 68, 49, 68),
+      scaffoldBackgroundColor: const Color.fromARGB(169, 253, 199, 253),
 
       filledButtonTheme: FilledButtonThemeData(
         style: ButtonStyle(

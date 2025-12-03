@@ -58,7 +58,7 @@ class _LoginForm extends ConsumerWidget {
 
     if (auth.status == AuthStatus.authenticated) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/');
+        context.go('/menu');
       });
     }
 
