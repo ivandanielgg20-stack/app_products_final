@@ -26,77 +26,76 @@ class ProductService {
     }
   }
 
-  /// Crear producto sin imagen (JSON)
-  Future<void> createProduct(Map<String, dynamic> productData) async {
-    final token = await TokenHelper.getToken();
-    if (token == null || token.isEmpty) {
-      throw Exception('No hay token de autenticación. Inicia sesión primero.');
-    }
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/products'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode(productData),
-    );
-
-    if (response.statusCode != 201) {
-      throw Exception(
-          'Error al crear producto: ${response.statusCode} → ${response.body}');
-    }
+  /// Paso 1: subir imagen
+  /// Paso 1: subir imagen
+Future<String> uploadProductImage(File imageFile) async {
+  final token = await TokenHelper.getToken();
+  if (token == null || token.isEmpty) {
+    throw Exception('No hay token de autenticación. Inicia sesión primero.');
   }
 
-  /// Crear producto con imagen (Multipart)
-  /// Crear producto con imagen (Multipart)
-Future<void> createProductWithImage(
-  Map<String, dynamic> productData,
-  File imageFile,
-) async {
+  final uri = Uri.parse('$baseUrl/files/product');
+  final request = http.MultipartRequest('POST', uri);
+
+  // adjuntar archivo
+  request.files.add(
+    await http.MultipartFile.fromPath('file', imageFile.path),
+  );
+
+  // encabezado con token
+  request.headers['Authorization'] = 'Bearer $token';
+
+  final response = await request.send();
+  final respStr = await response.stream.bytesToString();
+
+  print('Respuesta upload: $respStr');
+
+  if (response.statusCode != 201 && response.statusCode != 200) {
+    throw Exception('Error al subir imagen: ${response.statusCode} → $respStr');
+  }
+
+  final data = json.decode(respStr);
+
+  // 👇 usar la clave correcta que devuelve el backend
+  return data['image'] ?? imageFile.path.split('/').last;
+}
+
+  /// Paso 2: crear producto en JSON puro
+  /// Paso 2: crear producto en JSON puro
+Future<void> createProduct(Map<String, dynamic> productData, String imageName) async {
   final token = await TokenHelper.getToken();
   if (token == null || token.isEmpty) {
     throw Exception('No hay token de autenticación. Inicia sesión primero.');
   }
 
   final uri = Uri.parse('$baseUrl/products');
-  final request = http.MultipartRequest('POST', uri);
 
-  // Campos simples
-  request.fields['title'] = productData['title'];
-  request.fields['description'] = productData['description'];
-  request.fields['price'] = productData['price'].toString();
-  request.fields['stock'] = productData['stock'].toString();
-  request.fields['gender'] = productData['gender'];
-  request.fields['slug'] = productData['slug'];
+  final body = {
+    "title": productData['title'],
+    "description": productData['description'],
+    "price": productData['price'],
+    "stock": productData['stock'],
+    "gender": productData['gender'],
+    "slug": productData['slug'],
+    "sizes": productData['sizes'], // array directo
+    "tags": productData['tags'],   // array directo
+    //  aquí usamos el nombre devuelto por uploadProductImage
+    "images": [imageName]
+  };
 
-  // Arrays como JSON string
-  request.fields['sizes'] = json.encode(productData['sizes']); // ["XS","S","M"]
-  request.fields['tags'] = json.encode(productData['tags']);   // ["shirt"]
-
-  // Imagen: nombre en array JSON
-  final imageName = imageFile.path.split('/').last;
-  request.fields['images'] = json.encode([imageName]);
-
-  // Archivo real
-  request.files.add(
-    await http.MultipartFile.fromPath('images', imageFile.path),
+  final response = await http.post(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode(body),
   );
 
-  // Token
-  request.headers['Authorization'] = 'Bearer $token';
-
-  // Debug
-  print('Campos enviados: ${request.fields}');
-
-  final response = await request.send();
-  final respStr = await response.stream.bytesToString();
-
-  print('Respuesta backend: $respStr');
+  print('Respuesta create: ${response.body}');
 
   if (response.statusCode != 201) {
-    throw Exception(
-        'Error al crear producto con imagen: ${response.statusCode} → $respStr');
+    throw Exception('Error al crear producto: ${response.statusCode} → ${response.body}');
   }
 }
 }

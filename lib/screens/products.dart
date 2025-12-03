@@ -46,6 +46,9 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> with RouteAware
             return const Center(child: Text('No hay productos'));
           }
 
+          // 👇 Ordenar por id descendente (último creado primero)
+          products.sort((a, b) => b.id.compareTo(a.id));
+
           return ListView.builder(
             itemCount: products.length,
             itemBuilder: (context, index) {

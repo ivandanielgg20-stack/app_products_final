@@ -67,14 +67,14 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
 
     state = state.copyWith(isLoading: true);
     try {
-      print('➡️ Intentando login con: ${state.email}');
+      print(' Intentando login con: ${state.email}');
       await ref.read(authProvider.notifier).login(state.email, state.password);
 
       final authState = ref.read(authProvider);
-      print('📡 Estado después de login: ${authState.status}, error: ${authState.errorMessage}');
+      print('Estado después de login: ${authState.status}, error: ${authState.errorMessage}');
 
       final token = await TokenHelper.getToken();
-      print('🔐 Token después del login: $token');
+      print('Token después del login: $token');
 
       if (authState.status == AuthStatus.authenticated && token != null && token.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +96,7 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
         );
       }
     } on CustomError catch (e) {
-      print('❌ Error atrapado en login: ${e.message}');
+      print(' Error atrapado en login: ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message),
@@ -104,7 +104,7 @@ class LoginFormNotifier extends StateNotifier<LoginFormState> {
         ),
       );
     } catch (e) {
-      print('❌ Error inesperado en login: $e');
+      print(' Error inesperado en login: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error inesperado: $e'),

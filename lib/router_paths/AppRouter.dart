@@ -20,8 +20,8 @@ final appRouter = GoRouter(
       builder: (context, state) => const ProductsScreen(),
     ),
     GoRoute(
-      path: '/add-product',
-      builder: (context, state) => const ProductForm(), // 👈 nueva ruta
-    ),
+  path: '/add-product',
+  builder: (context, state) => ProductForm(), // 👈 sin const
+),
   ],
 );
